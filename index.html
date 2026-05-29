@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工研菁英記者會 AI 新聞助理</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0F9E7A;--teal-dark:#0A7A5E;--teal-light:#E1F5EE;
+  --bg:#F8F9FA;--bg-card:#fff;--bg-surface:#F1F3F5;
+  --text:#1A1A1A;--text2:#555;--text3:#888;
+  --border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);
+  --r-md:8px;--r-lg:12px;--r-xl:16px;
+}
+body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+#wrap{width:100%;max-width:780px;display:flex;flex-direction:column;gap:1.25rem}
+#hdr{background:var(--bg-card);border-radius:var(--r-xl);border:.5px solid var(--border);padding:1.5rem 1.75rem;display:flex;align-items:center;gap:16px}
+#logo{width:48px;height:48px;border-radius:var(--r-md);background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#logo i{color:#fff;font-size:24px}
+#hdr-title{font-size:20px;font-weight:600;letter-spacing:-.01em}
+#hdr-sub{font-size:13px;color:var(--text2);margin-top:3px}
+#dot{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--teal);background:var(--teal-light);padding:5px 12px;border-radius:99px}
+#dot::before{content:'';width:7px;height:7px;background:var(--teal);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#welcome{background:var(--teal-light);border-radius:var(--r-lg);border:.5px solid rgba(15,158,122,.25);padding:1rem 1.25rem}
+#welcome p{font-size:14px;color:#085041;line-height:1.75}
+#welcome strong{font-weight:600;color:#0F6E56}
+#chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;color:var(--text2);border:.5px solid var(--border2);border-radius:99px;padding:6px 14px;cursor:pointer;background:var(--bg-card);transition:all .15s;display:flex;align-items:center;gap:5px;user-select:none}
+.chip i{font-size:13px}
+.chip:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+#chat{background:var(--bg-card);border-radius:var(--r-xl);border:.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#msgs{padding:1.25rem;display:flex;flex-direction:column;gap:1rem;min-height:360px;max-height:520px;overflow-y:auto;scroll-behavior:smooth}
+#msgs::-webkit-scrollbar{width:4px}
+#msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.msg{display:flex;gap:10px;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:2px}
+.av.bot{background:var(--teal);color:#fff}
+.av.usr{background:var(--bg-surface);border:.5px solid var(--border2);color:var(--text2)}
+.bbl{max-width:76%;font-size:14.5px;line-height:1.75;border-radius:var(--r-lg);padding:10px 15px}
+.msg.user .bbl{background:var(--teal);color:#fff;border-bottom-right-radius:4px}
+.msg.bot .bbl{background:var(--bg-surface);color:var(--text);border-bottom-left-radius:4px;border:.5px solid var(--border)}
+.typing{display:flex;gap:5px;align-items:center;padding:4px 2px}
+.dot2{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:blink 1.2s infinite}
+.dot2:nth-child(2){animation-delay:.2s}.dot2:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+#inp{display:flex;gap:10px;align-items:flex-end;padding:1rem 1.25rem;border-top:.5px solid var(--border)}
+#txt{flex:1;resize:none;font-family:inherit;font-size:14.5px;padding:10px 14px;border-radius:var(--r-lg);border:.5px solid var(--border2);background:var(--bg-surface);color:var(--text);line-height:1.5;min-height:44px;max-height:120px;overflow-y:auto;transition:border-color .15s}
+#txt:focus{outline:none;border-color:var(--teal);background:#fff}
+#txt::placeholder{color:var(--text3)}
+#sbtn{width:44px;height:44px;border-radius:var(--r-md);background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,opacity .15s}
+#sbtn:hover{background:var(--teal-dark)}
+#sbtn i{color:#fff;font-size:18px}
+#sbtn:disabled{opacity:.4;cursor:not-allowed}
+#foot{text-align:center;font-size:12px;color:var(--text3);padding:.5rem 0 0}
+@media(max-width:480px){body{padding:1rem .75rem}#hdr{padding:1.25rem}#dot{display:none}.bbl{max-width:88%;font-size:14px}#msgs{min-height:300px;max-height:400px}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="hdr">
+    <div id="logo"><i class="ti ti-building-factory-2"></i></div>
+    <div>
+      <div id="hdr-title">工研菁英記者會 AI 新聞助理</div>
+      <div id="hdr-sub">工業技術研究院 · 即時問答服務</div>
+    </div>
+    <div id="dot">服務中</div>
+  </div>
+
+  <div id="welcome">
+    <p>歡迎蒞臨工研菁英記者會！您可以直接輸入問題，向 AI 助理查詢：<br>
+    <strong>新聞稿</strong>、<strong>技術影片</strong>、<strong>技術介紹</strong>、<strong>技術規格資料</strong>、<strong>得獎項目</strong>、<strong>合作廠商</strong>等。無需登入，即問即答。</p>
+  </div>
+
+  <div id="chips">
+    <span class="chip" onclick="sc('請提供今年工研菁英獎的新聞稿內容')"><i class="ti ti-file-text"></i>新聞稿</span>
+    <span class="chip" onclick="sc('今年有哪些得獎技術？請介紹一下')"><i class="ti ti-trophy"></i>得獎技術</span>
+    <span class="chip" onclick="sc('有哪些技術影片可以觀看？')"><i class="ti ti-player-play"></i>技術影片</span>
+    <span class="chip" onclick="sc('請介紹工研菁英獎的傑出研究獎技術')"><i class="ti ti-microscope"></i>技術介紹</span>
+    <span class="chip" onclick="sc('這些技術與哪些產業或廠商合作？')"><i class="ti ti-building"></i>合作廠商</span>
+    <span class="chip" onclick="sc('工研院今年的技術對台灣產業有什麼影響？')"><i class="ti ti-chart-bar"></i>產業影響</span>
+  </div>
+
+  <div id="chat">
+    <div id="msgs">
+      <div class="msg bot">
+        <div class="av bot"><i class="ti ti-robot"></i></div>
+        <div class="bbl">您好，我是工研菁英記者會的 AI 新聞助理！<br>請問有什麼可以協助您的嗎？您可以詢問新聞稿、得獎技術、技術規格等相關內容。</div>
+      </div>
+    </div>
+    <div id="inp">
+      <textarea id="txt" placeholder="輸入您的問題…" rows="1"></textarea>
+      <button id="sbtn" onclick="send()" aria-label="送出"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+
+  <div id="foot">本服務由 AI 提供，回答內容僅供參考，詳細資料以工研院官方新聞稿為準。</div>
+</div>
+
+<script>
+const msgsEl=document.getElementById('msgs'),txtEl=document.getElementById('txt'),btnEl=document.getElementById('sbtn');
+let hist=[];
+
+function addMsg(role,text){
+  const d=document.createElement('div');d.className='msg '+(role==='user'?'user':'bot');
+  const a=document.createElement('div');a.className='av '+(role==='user'?'usr':'bot');
+  a.innerHTML=role==='user'?'<i class="ti ti-user"></i>':'<i class="ti ti-robot"></i>';
+  const b=document.createElement('div');b.className='bbl';
+  b.innerHTML=text.replace(/\n/g,'<br>');
+  d.appendChild(a);d.appendChild(b);msgsEl.appendChild(d);
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+}
+
+function showTyping(){
+  const d=document.createElement('div');d.className='msg bot';d.id='typing';
+  d.innerHTML='<div class="av bot"><i class="ti ti-robot"></i></div><div class="bbl"><div class="typing"><div class="dot2"></div><div class="dot2"></div><div class="dot2"></div></div></div>';
+  msgsEl.appendChild(d);msgsEl.scrollTop=msgsEl.scrollHeight;
+}
+function rmTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+async function callAPI(text){
+  hist.push({role:'user',content:text});
+  btnEl.disabled=true;showTyping();
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist})});
+    const d=await r.json();rmTyping();
+    const reply=d.reply||d.error||'抱歉，目前無法取得回應，請稍後再試。';
+    hist.push({role:'assistant',content:reply});addMsg('bot',reply);
+  }catch(e){rmTyping();addMsg('bot','連線發生問題，請稍後再試。');}
+  btnEl.disabled=false;txtEl.focus();
+}
+
+function send(){const t=txtEl.value.trim();if(!t)return;addMsg('user',t);txtEl.value='';txtEl.style.height='auto';callAPI(t);}
+function sc(t){addMsg('user',t);callAPI(t);}
+
+txtEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+txtEl.addEventListener('input',()=>{txtEl.style.height='auto';txtEl.style.height=Math.min(txtEl.scrollHeight,120)+'px';});
+</script>
+</body>
+</html>

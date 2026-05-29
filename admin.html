@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>後台管理 — 工研菁英記者會</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0F9E7A;--teal-dark:#0A7A5E;--teal-light:#E1F5EE;
+  --bg:#F8F9FA;--bg-card:#fff;--bg-surface:#F1F3F5;
+  --text:#1A1A1A;--text2:#555;--text3:#888;
+  --border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);
+  --r-md:8px;--r-lg:12px;--r-xl:16px;
+  --danger:#E24B4A;--danger-bg:#FCEBEB;
+  --success:#1D9E75;--success-bg:#E1F5EE;
+}
+body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+#wrap{width:100%;max-width:680px;display:flex;flex-direction:column;gap:1.25rem}
+
+/* Header */
+#hdr{background:var(--bg-card);border-radius:var(--r-xl);border:.5px solid var(--border);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:14px}
+#logo{width:40px;height:40px;border-radius:var(--r-md);background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#logo i{color:#fff;font-size:20px}
+#hdr-title{font-size:16px;font-weight:600}
+#hdr-sub{font-size:12px;color:var(--text2);margin-top:2px}
+#back-btn{margin-left:auto;font-size:13px;color:var(--text2);text-decoration:none;display:flex;align-items:center;gap:5px;border:.5px solid var(--border2);padding:6px 12px;border-radius:99px;transition:all .15s}
+#back-btn:hover{background:var(--bg-surface)}
+
+/* Login */
+#login-card{background:var(--bg-card);border-radius:var(--r-xl);border:.5px solid var(--border);padding:2rem}
+#login-card h2{font-size:16px;font-weight:500;margin-bottom:1.25rem;color:var(--text)}
+#login-card label{font-size:13px;color:var(--text2);display:block;margin-bottom:6px}
+#login-card input{width:100%;font-family:inherit;font-size:14px;padding:10px 14px;border-radius:var(--r-lg);border:.5px solid var(--border2);background:var(--bg-surface);color:var(--text);outline:none;transition:border-color .15s}
+#login-card input:focus{border-color:var(--teal);background:#fff}
+#login-btn{margin-top:1rem;width:100%;padding:11px;border-radius:var(--r-lg);background:var(--teal);color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s}
+#login-btn:hover{background:var(--teal-dark)}
+
+/* Editor */
+#editor-card{background:var(--bg-card);border-radius:var(--r-xl);border:.5px solid var(--border);padding:1.5rem;display:none;flex-direction:column;gap:1.25rem}
+#editor-card h2{font-size:16px;font-weight:500;color:var(--text)}
+#editor-desc{font-size:13px;color:var(--text2);line-height:1.6;background:var(--bg-surface);border-radius:var(--r-md);padding:.75rem 1rem;border:.5px solid var(--border)}
+#editor-desc strong{color:var(--text);font-weight:500}
+#prompt-area{width:100%;font-family:'Menlo','Monaco','Courier New',monospace;font-size:13px;line-height:1.7;padding:1rem;border-radius:var(--r-lg);border:.5px solid var(--border2);background:var(--bg-surface);color:var(--text);resize:vertical;min-height:400px;outline:none;transition:border-color .15s}
+#prompt-area:focus{border-color:var(--teal);background:#fff}
+#actions{display:flex;gap:10px;align-items:center}
+#save-btn{padding:10px 24px;border-radius:var(--r-lg);background:var(--teal);color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+#save-btn:hover{background:var(--teal-dark)}
+#save-btn:disabled{opacity:.5;cursor:not-allowed}
+#char-count{font-size:12px;color:var(--text3);margin-left:auto}
+
+/* Toast */
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:var(--r-lg);font-size:14px;font-weight:500;display:none;align-items:center;gap:8px;z-index:999;white-space:nowrap}
+#toast.success{background:var(--success-bg);color:var(--success);border:.5px solid rgba(29,158,117,.3)}
+#toast.error{background:var(--danger-bg);color:var(--danger);border:.5px solid rgba(226,75,74,.3)}
+
+#err-msg{font-size:13px;color:var(--danger);margin-top:.5rem;display:none}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <div id="hdr">
+    <div id="logo"><i class="ti ti-settings"></i></div>
+    <div>
+      <div id="hdr-title">後台管理</div>
+      <div id="hdr-sub">工研菁英記者會 AI 新聞助理</div>
+    </div>
+    <a href="/" id="back-btn"><i class="ti ti-arrow-left" style="font-size:14px"></i>前台</a>
+  </div>
+
+  <div id="login-card">
+    <h2><i class="ti ti-lock" style="font-size:16px;vertical-align:-2px;margin-right:6px"></i>請輸入管理員密碼</h2>
+    <label for="pwd-input">密碼</label>
+    <input type="password" id="pwd-input" placeholder="••••••••" autocomplete="current-password">
+    <div id="err-msg">密碼錯誤，請再試一次。</div>
+    <button id="login-btn" onclick="doLogin()">登入</button>
+  </div>
+
+  <div id="editor-card">
+    <h2><i class="ti ti-file-text" style="font-size:16px;vertical-align:-2px;margin-right:6px"></i>編輯 AI 知識庫內容</h2>
+    <div id="editor-desc">
+      在下方直接編輯 AI 助理的背景資料。可隨時更新<strong>新聞稿、得獎技術、合作廠商</strong>等內容。儲存後約 <strong>30 秒</strong>內生效，記者端會立即看到最新回答。
+    </div>
+    <textarea id="prompt-area" oninput="updateCount()"></textarea>
+    <div id="actions">
+      <button id="save-btn" onclick="doSave()">
+        <i class="ti ti-device-floppy" style="font-size:16px"></i>儲存並更新
+      </button>
+      <span id="char-count">0 字</span>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const DEFAULT_PROMPT = `你是「工研菁英記者會 AI 新聞助理」，專門服務前來採訪工研院工研菁英記者會的媒體記者。
+
+你的任務：
+- 只回答與工研院、工研菁英獎、本次記者會相關的問題
+- 提供新聞稿內容、技術介紹、得獎技術說明、合作廠商資訊
+- 如記者詢問技術影片，請說明目前可至工研院官網或現場工作人員取得
+- 態度專業、友善、回答精確，適合媒體使用
+- 若問題超出本次記者會範圍，請禮貌婉拒並引導回相關主題
+
+【本次記者會背景資料】
+
+工研菁英獎為工研院年度最高榮譽，被稱為「工研院奧斯卡獎」。
+
+【產業化貢獻獎 — 金獎】
+1. 商業服務智慧革新：打造智慧零售流通AI方案，導入AI於營運規劃、存貨管理（AI預測商品效期）、行銷引客（AI圖文生成），已協助全家、美廉社等業者。
+2. 預兆診斷技術及應用：即時監控設備壽命與故障辨識，出貨超過1,500套，服務逾200家企業，應用於半導體、金屬加工等六大產業，協助防止晶圓報廢，營收提升逾20%。
+
+【傑出研究獎 — 金獎】
+1. 超低功耗邊緣辨識技術：全球最高能效AI運算晶片，省電效能達10倍以上，適用於無人機、機器人等前瞻技術。
+2. 智慧管路洩漏聽診系統：結合AI與5G，地下漏水檢測準確率達98%以上，每年可節水逾1,094萬噸，已與台灣自來水公司合作。
+3. H型鋼構雷射銲接技術：以雷射取代傳統銲接，結合數位孿生與智慧感測，產速提升5倍、成本降至三分之一、碳排減少88%。
+4. 乙烯聚合高值技術：高效聚合觸媒系統，可應用於電纜、機器人零件、汽車保險桿等高階材料，已與國內石化企業合作。
+
+回答要簡潔有力，適合記者直接引用或作為背景參考。若記者詢問具體數字、引述，請建議以官方新聞稿為準。`;
+
+let password = '';
+
+function doLogin() {
+  const pwd = document.getElementById('pwd-input').value;
+  if (!pwd) return;
+  password = pwd;
+  document.getElementById('err-msg').style.display = 'none';
+  document.getElementById('login-card').style.display = 'none';
+  const ed = document.getElementById('editor-card');
+  ed.style.display = 'flex';
+  document.getElementById('prompt-area').value = DEFAULT_PROMPT;
+  updateCount();
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function updateCount() {
+  const len = document.getElementById('prompt-area').value.length;
+  document.getElementById('char-count').textContent = len.toLocaleString() + ' 字';
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type;
+  t.style.display = 'flex';
+  setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+
+async function doSave() {
+  const prompt = document.getElementById('prompt-area').value.trim();
+  if (!prompt) { showToast('內容不可為空', 'error'); return; }
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="font-size:16px"></i>更新中…';
+
+  try {
+    const r = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, systemPrompt: prompt })
+    });
+    const d = await r.json();
+    if (d.success) {
+      showToast('✓ ' + d.message, 'success');
+    } else {
+      if (r.status === 401) {
+        document.getElementById('err-msg').style.display = 'block';
+        document.getElementById('editor-card').style.display = 'none';
+        document.getElementById('login-card').style.display = 'block';
+      }
+      showToast('錯誤：' + (d.error || '請稍後再試'), 'error');
+    }
+  } catch(e) {
+    showToast('連線失敗，請稍後再試', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-device-floppy" style="font-size:16px"></i>儲存並更新';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "itri-press-ai-v2",
+  "version": "2.0.0",
+  "description": "工研菁英記者會 AI 新聞助理（含後台管理）",
+  "engines": { "node": ">=18" }
+}
