@@ -105,18 +105,13 @@ const msgsEl=document.getElementById('msgs'),txtEl=document.getElementById('txt'
 let hist=[];
 
 function renderText(text){
-  // 圖片：知識庫裡寫 IMAGE:https://... 就會顯示圖片
- text=text.replace(/(?<!['"=])(https?:\/\/[^\s<"']+)/g,
-  '<a href="$1" target="_blank" rel="noopener" style="color:#0F9E7A;text-decoration:underline;">$1</a>');
-  // 標題 ### / ##
+  text=text.replace(/IMAGE:(https?:\/\/[^\s]+)/g,
+    '<br><img src="$1" style="max-width:100%;border-radius:8px;margin:8px 0;display:block;"><br>');
   text=text.replace(/^### (.+)$/gm,'<strong style="font-size:15px;color:#0F9E7A;display:block;margin:8px 0 4px;">$1</strong>');
   text=text.replace(/^## (.+)$/gm,'<strong style="font-size:16px;color:#0F9E7A;display:block;margin:8px 0 4px;">$1</strong>');
-  // 粗體 **text**
   text=text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  // 可點擊連結
-  text=text.replace(/(https?:\/\/[^\s<"]+)/g,
+  text=text.replace(/(?<!['"=])(https?:\/\/[^\s<"']+)/g,
     '<a href="$1" target="_blank" rel="noopener" style="color:#0F9E7A;text-decoration:underline;">$1</a>');
-  // 換行
   return text.replace(/\n/g,'<br>');
 }
 
